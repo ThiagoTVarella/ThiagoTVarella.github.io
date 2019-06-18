@@ -1,0 +1,101 @@
+:root {
+    --c-footer: rgba(180, 180, 180, 1);
+    --c-menu: rgba(50, 50, 50, 1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+body {
+    color: #111111;
+    font-family: 'Comfortaa', cursive;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.5em;
+    background: rgb(255, 255, 255);
+    height: 90%;
+    width: 100%;
+    position: relative;
+}
+
+section {
+    width: 100%;
+}
+
+footer {
+    box-shadow: 0px 0px 30px 30px var(--c-footer);
+    background-color: var(--c-footer);
+    position:absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-size: 12px;
+}
+
+.container {
+    box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.2);
+    margin: 5%;
+    min-height:90%;
+    width: 90%;
+    position: relative;
+}
+
+img {
+    max-width: 11cm;
+}
+
+/******************** MENU ********************/
+
+.menu-bar {
+    position: absolute;
+    top: 20px;    
+    left: calc(50% - 10px);
+    height: 14px;
+}
+
+.bars {
+    display: block;
+    width: 20px;
+    height: 2px;    
+    background-color: var(--c-menu);
+    box-shadow: 0 5px 0 var(--c-menu), 0 10px 0 var(--c-menu);
+}
+
+.menu {
+    position: absolute;
+    display: none; 
+    width: 100%;
+    padding: 10px 10px 10px;
+    margin: 0 auto;
+    text-align: center;
+    background-color: rgba(255, 32, 32, 0);
+}
+
+@media (max-width: 850px) {
+    .menu {
+      left: 0;
+    }
+  }  
+
+.menu ul {
+    margin-bottom: 0;
+}
+.menu a {
+    color: rgb(0, 0, 0); 
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+.menu a:hover {
+    text-decoration: none;
+    opacity: 1;
+    letter-spacing: 1px;
+}
+
+/******************** MENU END ********************/
