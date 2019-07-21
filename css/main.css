@@ -30,7 +30,7 @@ section {
 }
 
 footer {
-    box-shadow: 0px 0px 30px 30px var(--c-footer);
+    box-shadow: 0px 0px 20px 1px var(--c-footer);
     background-color: var(--c-footer);
     position:absolute;
     bottom: 0;
@@ -99,3 +99,7 @@ img {
 }
 
 /******************** MENU END ********************/
+
+tab { 
+	padding-left: 4em;
+}
