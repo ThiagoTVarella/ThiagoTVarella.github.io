@@ -30,7 +30,7 @@ section {
 }
 
 footer {
-    box-shadow: 0px 0px 20px 1px var(--c-footer);
+    box-shadow: 0px 0px 5px 1px var(--c-footer);
     background-color: var(--c-footer);
     position:absolute;
     bottom: 0;
@@ -40,7 +40,7 @@ footer {
 }
 
 .container {
-    box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.2);
     margin: 5%;
     min-height:90%;
     width: 90%;
