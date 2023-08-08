@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Site</title>
+  <link rel="stylesheet" type="text/css" href="main.css">
+</head>
+<body>
+    <!-- Create 3 columns -->
+    <div style="display: flex; flex-direction: row;">
+
+      <!-- Create a column for the students -->
+      <div style="flex: 1;">
+
+        <!-- Create a div for the students -->
+        <div id="studentsDiv">
+          <h2> Scheduler </h2>
+        </div>
+
+        <!-- Create a div for the students' preferences -->
+        <div id="InitialInfo">
+          <h4> Initial info: name of students, name of Professors, number of timeslots </h4>
+          <form>
+            <h4> Students</h4>
+            <input type="text" id="students" placeholder="Enter students here, separated by commas">
+            <h4> Professors </h4>
+            <input type="text" id="professors" placeholder="Enter professors here, separated by commas">
+            <h4> Timeslots </h4>
+            <input type="text" id="timeslots" placeholder="Enter number of timeslots">
+            <input type="button" value="Submit" onclick="parseNames()">
+        
+            <!-- Button to reset everything -->
+            <input type="button" value="Reset" onclick="window.location.reload()">
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Create a column for the professors -->
+      <div style="flex: 1;">
+
+        <!-- Create a div for the professors -->
+        <div id="Details">
+          <h2> More details </h2>
+        </div>
+
+        <!-- Create a div for the professors' availability -->
+        <div id="enterdetails">
+          <h4> For each student, enter the name of preferred interviewers. For each Professor, enter available timeslot IDs. </h4>
+
+          <p id="details"></p>
+        </div>
+
+      </div>
+
+      <!-- Create a column for the timeslots -->
+      <div style="flex: 1;">
+
+        <!-- Create a div for the timeslots -->
+        <div id="ResultsDiv">
+          <h2> Results </h2>
+        </div>
+        <div id="Display results">
+          <h4> Here the results will be displayed. </h4>
+          <p id="result"></p>
+        </div>
+
+      </div>
+
+    <!-- Insert script based on manualinputjs.js -->
+    <script src="manualinputjs.js"></script>
+
+</body>
+</html>

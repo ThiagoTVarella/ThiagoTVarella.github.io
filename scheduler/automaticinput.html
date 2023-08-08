@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Site</title>
+  <link rel="stylesheet" type="text/css" href="main.css">
+</head>
+<body>
+    <!-- Create 3 columns -->
+    <div style="display: flex; flex-direction: row;">
+
+      <!-- Create a column for the students -->
+      <div style="flex: 1;">
+
+        <!-- Create a div for the students -->
+        <div id="studentsDiv">
+          <h2> Initial form </h2>
+        </div>
+
+        <!-- Create a div for the students' preferences -->
+        <div id="InitialInfo">
+            <h4> Create a google forms that looks like the following form: </h4>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScprfbioQUBZxAhKjxKGclUZxJ6OtETpHC_tJpoqep8z_9jRA/viewform?usp=sf_link">Google forms template from the answerer's perspective</a>
+            <h4> If you want, request access to Thiago T. Varella of the form to be able to copy it. </h4>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScprfbioQUBZxAhKjxKGclUZxJ6OtETpHC_tJpoqep8z_9jRA/viewform?usp=sharing">Google forms template from the editor's perspective</a>
+        </div>
+
+        
+      </div>
+
+      <!-- Create a column for the professors -->
+      <div style="flex: 1;">
+
+        <!-- Create a div for the professors -->
+        <div id="Details">
+          <h2> Import data </h2>
+        </div>
+
+        <!-- Create a div for the professors' availability -->
+        <div id="enterdetails">
+            <h4> Save the google sheets from the forms as a .csv file. To do that, you:</h4>
+            <!-- Create an enumerated list-->
+            <ol>
+                <li> Open the google forms </li>
+                <li> Click on "Responses" </li>
+                <li> Click on "View in Sheets" </li>
+                <li> Click on "File" </li>
+                <li> Click on "Download" </li>
+                <li> Click on "Comma-separated values (.csv)" </li>
+            </ol>
+            <h4> Then, upload the .csv file here: </h4>
+
+            <input type="file" name="file" id="file" accept=".csv" > <br><br>
+            <h4> and submit it. </h4>
+            <input type="button" id="btnsubmit" value="Submit" onclick="readCSVFile();" >   
+            <p id="details"></p>
+        </div>
+
+      </div>
+
+      <!-- Create a column for the timeslots -->
+      <div style="flex: 1;">
+
+        <!-- Create a div for the timeslots -->
+        <div id="ResultsDiv">
+          <h2> Results </h2>
+        </div>
+        <div id="Display results">
+          <h4> Here the results will be displayed. </h4>
+
+            <!-- List CSV file data -->
+            <table id="tblcsvdata" style="border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>S.no</th>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+
+        </table>
+
+
+          <p id="result"></p>
+        </div>
+
+      </div>
+
+    <!-- Insert script based on manualinputjs.js -->
+    <script src="automaticinputjs.js"></script>
+
+</body>
+</html>
