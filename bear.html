@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bear Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff;
+        }
+        #game-container {
+            text-align: center;
+        }
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(8, 46px); /* Adjust the number of columns */
+            grid-template-rows: repeat(7, 51.98px); /* Adjust rows to accommodate hexagons */
+            grid-gap: 0px;
+            margin-bottom: 20px;
+        }
+
+        .hex {
+            width: 60px;
+            height: 51.96px; /* Approximated for a 1:√3 hexagon */
+            background-color: #e6c9ad;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .row-even .hex {
+            /* margin-left: 15px; /* Shift alternating rows by half the hexagon width */
+            transform: translateY(-25.98px) translateX(-1px); /* Shift alternating rows by half the hexagon width */
+            margin-left: 2px; /* Shift alternating rows by half the hexagon width */
+            margin-top: 0.9px; /* Shift alternating rows by half the hexagon width */
+        }
+
+        .row-odd .hex {
+            margin-left: 1px; /* Shift alternating rows by half the hexagon width */
+            margin-top: 1px; /* Shift alternating rows by half the hexagon width */
+        }
+
+        .hex.selected {
+            background-color: #ffff00;
+        }
+        .hex.removed {
+            background-color: #ebac87;
+        }
+        .bear {
+            font-size: 24px;
+        }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Bear Game</h1>
+        <div id="game-board"></div>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        const board = document.getElementById('game-board');
+        const status = document.getElementById('status');
+        let currentPlayer = 1;
+        let selectedHex = null;
+        let bears = [];
+        let scores = [0, 0];
+        let placementPhase = true;
+
+        function createBoard() {
+            const board = document.getElementById('game-board');
+            const hexPerRow = 7; // Number of hexagons per row
+            const totalRows = 8; // Total number of rows
+
+            for (let row = 0; row < totalRows; row++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row';
+
+                if (row % 2 !== 0) {
+                    rowDiv.classList.add('row-even'); // Add the staggered class for even rows
+                }
+
+                if (row % 2 !== 1) {
+                    rowDiv.classList.add('row-odd'); // Add the staggered class for even rows
+                }
+                
+
+                for (let col = 0; col < hexPerRow; col++) {
+
+                    const hex = document.createElement('div');
+                    hex.className = 'hex';
+                    hex.dataset.index = row * hexPerRow + col;
+                    const fish = Math.floor(Math.random() * 6) + 1;
+                    if (fish > 5) {
+                        hex.textContent = '🍯'.repeat(3);
+                    } else {
+                        if (fish > 2) {
+                            hex.textContent = '🍯'.repeat(2);
+                        } else {
+                            hex.textContent = '🍯'.repeat(1);
+                        }
+                    }
+
+                    hex.addEventListener('click', handleHexClick);
+                    rowDiv.appendChild(hex);
+                }
+
+                board.appendChild(rowDiv);
+            }
+        }
+
+        function handleHexClick(event) {
+            const hex = event.target;
+            if (hex.classList.contains('removed')) return;
+
+            if (placementPhase) {
+                if (!hex.textContent.includes('🐻')) {
+                    placebear(hex);
+                }
+            } else {
+                if (selectedHex) {
+                    movebear(selectedHex, hex);
+                } else if (hex.textContent.includes(`🐻${currentPlayer}`)) {
+                    selectbear(hex);
+                }
+            }
+        }
+
+        function selectbear(hex) {
+            if (hex.textContent.includes(`🐻${currentPlayer}`)) {
+                if (selectedHex) {
+                    selectedHex.classList.remove('selected');
+                }
+                selectedHex = hex;
+                hex.classList.add('selected');
+            }
+        }
+
+        function placebear(hex) {
+            hex.textContent += `🐻${currentPlayer}`;
+            bears.push(hex.dataset.index);
+            switchPlayer();
+            if (bears.length === 4) {
+                placementPhase = false;
+                updateStatus();
+            }
+        }
+
+        function movebear(from, to) {
+            const dx = to.dataset.index % 8 - from.dataset.index % 8;
+            const dy = Math.floor(to.dataset.index / 7) - Math.floor(from.dataset.index / 7);
+            if (isValidMove(dx, dy) && !to.textContent.includes('🐻')) {
+                to.textContent += from.textContent.slice(-2);
+                const fish = from.textContent.split('🍯').length - 1;
+                scores[currentPlayer - 1] += fish;
+                from.textContent = '';
+                from.classList.add('removed');
+                selectedHex.classList.remove('selected');
+                selectedHex = null;
+                bears = bears.map(p => p === from.dataset.index ? to.dataset.index : p);
+                switchPlayer();
+                checkGameOver();
+            }
+        }
+
+        function isValidMove(dx, dy) {
+            const flag1 = (dx === 0 && dy !== 0);
+            const flag2 = (dy === 0 && dx !== 0);
+            const flag3 = (Math.abs(dx) === Math.abs(dy));
+            return flag1 || flag2;
+            // return flag1 || flag2 || flag3;
+        }
+
+        function switchPlayer() {
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            updateStatus();
+        }
+
+        function updateStatus() {
+            if (placementPhase) {
+                status.textContent = `Placement phase: Player ${currentPlayer}, place your bear. bears placed: ${bears.length}/4`;
+            } else {
+                status.textContent = `Player ${currentPlayer}'s turn. Scores - Player 1: ${scores[0]}, Player 2: ${scores[1]}`;
+            }
+        }
+
+        function checkGameOver() {
+            const movablebears = bears.filter(p => {
+                const hex = document.querySelector(`.hex[data-index="${p}"]`);
+                return canbearMove(hex);
+            });
+
+            if (movablebears.length === 0) {
+                const winner = scores[0] > scores[1] ? 1 : scores[1] > scores[0] ? 2 : 'Tie';
+                status.textContent = `Game Over! ${winner === 'Tie' ? "It's a tie!" : `Player ${winner} wins!`}`;
+            }
+        }
+
+        function canbearMove(hex) {
+            const index = parseInt(hex.dataset.index);
+            const directions = [-5, -4, 1, 5, 4, -1];
+            return directions.some(dir => {
+                const newIndex = index + dir;
+                if (newIndex < 0 || newIndex >= 25) return false;
+                const newHex = document.querySelector(`.hex[data-index="${newIndex}"]`);
+                return newHex && !newHex.classList.contains('removed') && !newHex.textContent.includes('🐻');
+            });
+        }
+
+        createBoard();
+        updateStatus();
+    </script>
+</body>
+</html>
