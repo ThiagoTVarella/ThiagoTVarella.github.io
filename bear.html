@@ -19,8 +19,8 @@
         }
         #game-board {
             display: grid;
-            grid-template-columns: repeat(8, 46px); /* Adjust the number of columns */
-            grid-template-rows: repeat(7, 51.98px); /* Adjust rows to accommodate hexagons */
+            grid-template-columns: repeat(9, 46px); /* Adjust the number of columns */
+            grid-template-rows: repeat(8, 51.98px); /* Adjust rows to accommodate hexagons */
             grid-gap: 0px;
             margin-bottom: 20px;
         }
@@ -76,14 +76,15 @@
         const status = document.getElementById('status');
         let currentPlayer = 1;
         let selectedHex = null;
-        let bears = [];
+        let bears1 = [];
+        let bears2 = [];
         let scores = [0, 0];
         let placementPhase = true;
 
         function createBoard() {
             const board = document.getElementById('game-board');
-            const hexPerRow = 7; // Number of hexagons per row
-            const totalRows = 8; // Total number of rows
+            const hexPerRow = 8; // Number of hexagons per row
+            const totalRows = 9; // Total number of rows
 
             for (let row = 0; row < totalRows; row++) {
                 const rowDiv = document.createElement('div');
@@ -102,7 +103,8 @@
 
                     const hex = document.createElement('div');
                     hex.className = 'hex';
-                    hex.dataset.index = row * hexPerRow + col;
+                    hex.dataset.index1 = row;
+                    hex.dataset.index2 = col;
                     const fish = Math.floor(Math.random() * 6) + 1;
                     if (fish > 5) {
                         hex.textContent = '🍯'.repeat(3);
@@ -113,6 +115,7 @@
                             hex.textContent = '🍯'.repeat(1);
                         }
                     }
+                    // hex.textContent += row + ',' + col;
 
                     hex.addEventListener('click', handleHexClick);
                     rowDiv.appendChild(hex);
@@ -132,8 +135,16 @@
                 }
             } else {
                 if (selectedHex) {
-                    movebear(selectedHex, hex);
+                    if (selectedHex === hex) {
+                        // If the same hex is clicked, unselect it
+                        selectedHex.classList.remove('selected');
+                        selectedHex = null;
+                    } else {
+                        // Move bear if a different hex is clicked
+                        movebear(selectedHex, hex);
+                    }
                 } else if (hex.textContent.includes(`🐻${currentPlayer}`)) {
+                    // validMoves(hex)
                     selectbear(hex);
                 }
             }
@@ -151,37 +162,126 @@
 
         function placebear(hex) {
             hex.textContent += `🐻${currentPlayer}`;
-            bears.push(hex.dataset.index);
+            bears1.push(hex.dataset.index1);
+            bears2.push(hex.dataset.index2);
             switchPlayer();
-            if (bears.length === 4) {
+            if (bears1.length === 4) {
                 placementPhase = false;
                 updateStatus();
             }
         }
 
+        // Function that inputs from and checks every hex on the board to see if it would be valid to move there
+        function validMoves(from) {
+            const index1 = from.dataset.index1;
+            const index2 = from.dataset.index2;
+            // iterate over each hex on the board
+            for (let i = 0; i < 7; i++) {
+                for (let j = 0; j < 8; j++) {
+                    const hex = document.querySelector(`.hex[data-index1="${i}"][data-index2="${j}"]`);
+                    if (hex && !hex.classList.contains('removed') && !hex.textContent.includes('🐻')) {
+                        if (isPathValid(from, hex)) {
+                            hex.textContent += 'X';
+                        }
+                    }
+                }
+            }
+
+        }
+
         function movebear(from, to) {
-            const dx = to.dataset.index % 8 - from.dataset.index % 8;
-            const dy = Math.floor(to.dataset.index / 7) - Math.floor(from.dataset.index / 7);
-            if (isValidMove(dx, dy) && !to.textContent.includes('🐻')) {
-                to.textContent += from.textContent.slice(-2);
+            const dx = to.dataset.index1 - from.dataset.index1;
+            const dy = to.dataset.index2 - from.dataset.index2;
+            if (isPathValid(from,to) && !to.textContent.includes('🐻')) {
+                to.textContent += '🐻';
+                to.textContent += from.textContent.slice(-1);
                 const fish = from.textContent.split('🍯').length - 1;
                 scores[currentPlayer - 1] += fish;
                 from.textContent = '';
                 from.classList.add('removed');
                 selectedHex.classList.remove('selected');
                 selectedHex = null;
-                bears = bears.map(p => p === from.dataset.index ? to.dataset.index : p);
+                bears1 = bears1.map(p => p === from.dataset.index1 ? to.dataset.index1 : p);
+                bears2 = bears2.map(p => p === from.dataset.index2 ? to.dataset.index2 : p);
                 switchPlayer();
                 checkGameOver();
+            } else {
+                console.log('');
+                console.log('Invalid move:');
+                console.log(from.dataset.index1, from.dataset.index2, 'to', to.dataset.index1, to.dataset.index2);
+                console.log('----...----');
             }
         }
 
-        function isValidMove(dx, dy) {
-            const flag1 = (dx === 0 && dy !== 0);
-            const flag2 = (dy === 0 && dx !== 0);
-            const flag3 = (Math.abs(dx) === Math.abs(dy));
-            return flag1 || flag2;
-            // return flag1 || flag2 || flag3;
+        // Make function isPathValid that checks if there is any hex between from and to that includes bear or that is removed
+        function isPathValid(from, to) {
+            if (!from || !to) {
+                console.log('ERROR: from or to is null');
+                return false;
+            }
+
+            const dx = to.dataset.index1 - from.dataset.index1;
+            const dy = to.dataset.index2 - from.dataset.index2;
+
+            const steps = Math.max(Math.abs(dx), Math.abs(dy));
+
+            let x = parseInt(from.dataset.index1);
+            let y = parseInt(from.dataset.index2);
+
+            for (let i = 1; i < steps+1; i++) {
+                // Calculate the next hex coordinates
+                if (dx === 0) {
+                    // Vertical movement
+                    y += Math.sign(dy);
+                } else {
+                    if (from.dataset.index1 % 2 === 0) {
+                        // Diagonal movement
+                        x += Math.sign(dx);
+                        if (Math.sign(dy) > 0) { 
+                            if (i % 2 === 1) {
+                                y += Math.sign(dy);
+                            }
+                        } else {
+                            if (i % 2 === 0) {
+                                y += Math.sign(dy);
+                            }
+                        }
+                    } else {
+                        // Diagonal movement
+                        x += Math.sign(dx);
+                        if (Math.sign(dy) > 0) { 
+                            if (i % 2 === 0) {
+                                y += Math.sign(dy);
+                            }
+                        } else {
+                            if (i % 2 === 1) {
+                                y += Math.sign(dy);
+                            }
+                        }
+                    }
+                } 
+
+                const hex = document.querySelector(`.hex[data-index1="${x}"][data-index2="${y}"]`);
+                if (hex) {
+                    console.log('path',x,y,'content',hex.textContent);
+                } else {
+                    return false
+                }
+                // hex.textContent += 'X';
+                if (!hex || hex.textContent.includes('🐻') || hex.classList.contains('removed')) {
+                    console.log('ERROR: Path is blocked by bear or removed hex');
+                    return false;
+                }
+            }
+            console.log('dx, dy:',dx,dy);
+            console.log('pathend:',x,y,'destination:',parseInt(to.dataset.index1),parseInt(to.dataset.index2));
+            // return false if the end of the path is different from to
+            if (x !== parseInt(to.dataset.index1) || y !== parseInt(to.dataset.index2)) {
+                console.log('ERROR: End of path is different from destination');
+                return false;
+            }
+
+            return true;
         }
 
         function switchPlayer() {
@@ -191,15 +291,17 @@
 
         function updateStatus() {
             if (placementPhase) {
-                status.textContent = `Placement phase: Player ${currentPlayer}, place your bear. bears placed: ${bears.length}/4`;
+                status.textContent = `Player ${currentPlayer}, place your bear. bears placed: ${bears1.length}/4`;
             } else {
                 status.textContent = `Player ${currentPlayer}'s turn. Scores - Player 1: ${scores[0]}, Player 2: ${scores[1]}`;
+                console.log(`Player ${currentPlayer}'s turn. Scores - Player 1: ${scores[0]}, Player 2: ${scores[1]}`);
+
             }
         }
 
         function checkGameOver() {
-            const movablebears = bears.filter(p => {
-                const hex = document.querySelector(`.hex[data-index="${p}"]`);
+            const movablebears = bears1.filter(p => {
+                const hex = document.querySelector(`.hex[data-index1="${p}"]`);
                 return canbearMove(hex);
             });
 
@@ -210,12 +312,13 @@
         }
 
         function canbearMove(hex) {
-            const index = parseInt(hex.dataset.index);
+            const index1 = parseInt(hex.dataset.index1);
+            const index2 = parseInt(hex.dataset.index2);
             const directions = [-5, -4, 1, 5, 4, -1];
             return directions.some(dir => {
-                const newIndex = index + dir;
+                const newIndex = index1 + dir;
                 if (newIndex < 0 || newIndex >= 25) return false;
-                const newHex = document.querySelector(`.hex[data-index="${newIndex}"]`);
+                const newHex = document.querySelector(`.hex[data-index1="${newIndex}"]`);
                 return newHex && !newHex.classList.contains('removed') && !newHex.textContent.includes('🐻');
             });
         }
