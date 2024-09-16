@@ -82,7 +82,7 @@
         <h1>Bear Game</h1>
         <div id="game-board"></div>
         <div id="status"></div>
-        <button id="build-bridge" onclick="buildBridge()">Build Bridge (<span id="bridge-cost">5</span> 🍯)</button><br>
+        <button id="build-bridge" onclick="buildBridge()">Build Bridge (<span id="bridge-cost"></span> 🍯)</button><br>
         <button id="skip-turn" onclick="skipTurn()">Skip Turn</button>
         <p> Before the game starts, each player has to place 3 bears on <br> the board. Then, move any tiles in one of the six directions <br> to collect the most honeypots (no jumping over other bears <br> or gaps). You can rebuild a gap by spending honeypots. </p>
     </div>
@@ -126,11 +126,11 @@
                     hex.className = 'hex';
                     hex.dataset.index1 = row;
                     hex.dataset.index2 = col;
-                    const fish = Math.floor(Math.random() * 6) + 1;
-                    if (fish > 5) {
+                    const honeypot = Math.floor(Math.random() * 6) + 1;
+                    if (honeypot > 5) {
                         hex.textContent = '🍯'.repeat(3);
                     } else {
-                        if (fish > 2) {
+                        if (honeypot > 2) {
                             hex.textContent = '🍯'.repeat(2);
                         } else {
                             hex.textContent = '🍯'.repeat(1);
@@ -223,8 +223,8 @@
             if (isPathValid(from,to) && !to.textContent.includes('🐻')) {
                 to.textContent += '🐻';
                 to.textContent += from.textContent.slice(-1);
-                const fish = from.textContent.split('🍯').length - 1;
-                scores[currentPlayer - 1] += fish;
+                const honeypot = from.textContent.split('🍯').length - 1;
+                scores[currentPlayer - 1] += honeypot;
                 from.textContent = '';
                 from.classList.add('removed');
                 selectedHex.classList.remove('selected');
@@ -329,6 +329,11 @@
                 console.log(`Player ${currentPlayer}'s turn. Scores - Player 1: ${scores[0]}, Player 2: ${scores[1]}`);
 
             }
+            // Initial update to display the cost when the page loads
+            document.addEventListener('DOMContentLoaded', (event) => {
+                document.getElementById('bridge-cost').innerText = bridgeCost;
+            });                        
+
         }
 
         function checkGameOver() {
@@ -379,6 +384,7 @@
         function updateBridgeCost() {
             bridgeCost += 3;
             bridgeCostSpan.textContent = bridgeCost;
+            document.getElementById('bridge-cost').innerText = bridgeCost;            
         }        
 
         function skipTurn() {
