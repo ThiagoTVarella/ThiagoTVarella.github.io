@@ -51,6 +51,16 @@ img {
     max-width: 30cm;
 }
 
+.responsive-img {
+    width: 50%;
+}
+
+@media (max-width: 600px) {
+    .responsive-img {
+        width: 100%;
+    }
+}
+
 /******************** MENU ********************/
 
 .menu-bar {
